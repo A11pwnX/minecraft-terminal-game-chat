@@ -4,30 +4,28 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.ChatColor;
 
 public class Exec implements CommandExecutor {
     @Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        boolean returnValue = false;
-        if(args.length>0 && sender instanceof ConsoleCommandSender){
-            String cmd = "";
-            //Split the arguements into executable commands
-            for(int i = 0 ; i < args.length ; i++){
-                cmd = String.valueOf(cmd) + args[i];
-                cmd = String.valueOf(cmd) + " ";
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length > 0) {
+            StringBuilder cmdBuilder = new StringBuilder();
+            for (String arg : args) {
+                cmdBuilder.append(arg).append(" ");
             }
-            
-            //Show the console what is being executed
-            Bukkit.getServer().getConsoleSender().sendMessage(cmd);
-            
-            //Initializes the thread
-            new RunnableDemo(cmd);
 
-            returnValue = true;
+            String cmd = cmdBuilder.toString().trim();
+
+            sender.sendMessage(ChatColor.YELLOW + "run : " + cmd);
+
+            // Démarre un thread pour exécuter la commande
+            new Thread(new RunnableDemo(cmd, sender)).start();
+
+            return true;
+        } else {
+            sender.sendMessage(ChatColor.RED + "command");
+            return false;
         }
-        return returnValue;
-	}
+    }
 }
-
-    
